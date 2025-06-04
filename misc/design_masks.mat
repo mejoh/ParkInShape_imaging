@@ -1,0 +1,22 @@
+This document contains the commands used to generate the masks located in /project/3011154.01/MJ/FC/designs
+
+#PREPROCESSING
+ - VentricleMask
+fslroi $FSLDIR/data/atlases/HarvardOxford/HarvardOxford-sub-prob-1mm.nii.gz LVentricle 2 1; fslroi $FSLDIR/data/atlases/HarvardOxford/HarvardOxford-sub-prob-1mm.nii.gz RVentricle 13 1; fslmaths LVentricle -add RVentricle -thr 0.1 -bin -dilF /project/3011154.01/MJ/FC/designs/parcellation/VentricleMask
+
+
+# Script used to generate single-voxel mask (Andrew Jahn):
+fslmaths /opt/fsl/5.0.11/data/standard/MNI152_T1_1mm -mul 0 -add 1 -roi X 1 Y 1 Z 1 0 1 wm_roi_point -odt float
+fslmaths wm_roi_point -bin wm_roi_point
+# Script used to create a box roi
+fslmaths wm_roi_point -kernel box 4 -fmean wm_roi_box
+
+# r/l IPC mask
+# R Coordinates: 56 -20 28
+# R Voxel locations: 2mm(17 53 50), 1mm(34 106 100)
+fslmaths /opt/fsl/5.0.11/data/standard/MNI152_T1_1mm_brain -mul 0 -add 1 -roi 34 1 106 1 100 1 0 1 rIPC_point -odt float; fslmaths rIPC_point -kernel sphere 12 -fmean rIPC_sphere12 -odt float; fslmaths rIPC_sphere12 -thr 0.00001 -bin rIPC_sphere12
+
+# L Coordinates: -56 -20 28
+# L Voxel locations: 2mm(73 53 50), 1mm(146 106 100)
+fslmaths /opt/fsl/5.0.11/data/standard/MNI152_T1_1mm_brain -mul 0 -add 1 -roi 146 1 106 1 100 1 0 1 lIPC_point -odt float; fslmaths lIPC_point -kernel sphere 12 -fmean lIPC_sphere12 -odt float; fslmaths lIPC_sphere12 -thr 0.00001 -bin lIPC_sphere12
+
